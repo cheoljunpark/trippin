@@ -1,1 +1,37 @@
-spring.profiles.include=db
+server:
+  port: 8080
+
+spring:
+  profiles:
+    include: db
+    active: jwt, api
+
+  jpa:
+    #open-in-view: true
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    #    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        show-sql: true
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+
+  logging:
+    level:
+      org:
+        springframework:
+          orm:
+            jpa: DEBUG
+      com.trippin.api: DEBUG
+
+  security:
+    user:
+      name: ssafy
+      password: ssafy
