@@ -35,3 +35,8 @@ spring:
     user:
       name: ssafy
       password: ssafy
+
+  #swagger
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
