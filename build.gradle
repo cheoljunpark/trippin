@@ -43,6 +43,10 @@ dependencies {
   // test
   testImplementation 'junit:junit:4.13.1'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
+  implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+  // Jsoup 파싱
+  implementation 'org.jsoup:jsoup:1.14.3'
 }
 
 tasks.named('test') {
