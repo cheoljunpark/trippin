@@ -50,6 +50,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       "/",
       "/users/join",
       "/users/login",
+      "/users/",
+      "/users/{username}",
+      "/users/{username}/following",
+      "/users/{username}/follower",
+      "/users/{username}/privacy",
+      "/users/{username}/profile",
   };
 
 
