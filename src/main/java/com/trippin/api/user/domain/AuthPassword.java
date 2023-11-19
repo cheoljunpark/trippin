@@ -1,13 +1,15 @@
 package com.trippin.api.user.domain;
 
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/*
- * 암호화 출처:
- * https://hou27.tistory.com/entry/Spring-Boot-Spring-Security-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0-%EC%95%94%ED%98%B8%ED%99%94
- */
+// 암호화 출처: https://hou27.tistory.com/entry/Spring-Boot-Spring-Security-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0-%EC%95%94%ED%98%B8%ED%99%94
 
 @Entity
 @Builder
@@ -39,8 +38,9 @@ public class AuthPassword {
   private String password;
 
   @CreationTimestamp
-  @Column(name = "update_date", nullable = false, columnDefinition = "DATETIME")
-  private LocalDateTime updateDate;
+  @Temporal(TemporalType.DATE)
+  @Column(name = "update_date", nullable = false)
+  private Date updateDate;
 
   /**
    * 비밀번호를 암호화

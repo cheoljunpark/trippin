@@ -4,11 +4,21 @@ import com.trippin.api.exception.BaseException;
 import com.trippin.api.exception.ErrorCode;
 import com.trippin.api.jwt.JwtTokenUtil;
 import com.trippin.api.user.domain.AuthPassword;
+import com.trippin.api.user.domain.UserFollow;
 import com.trippin.api.user.domain.UserLogin;
+import com.trippin.api.user.domain.UserPrivacy;
+import com.trippin.api.user.domain.UserProfile;
 import com.trippin.api.user.dto.JoinDto;
 import com.trippin.api.user.dto.LoginDto;
+import com.trippin.api.user.dto.UserPrivacyDto;
+import com.trippin.api.user.dto.UserProfileDto;
 import com.trippin.api.user.repository.AuthPasswordRepository;
+import com.trippin.api.user.repository.UserFollowRepository;
 import com.trippin.api.user.repository.UserLoginRepository;
+import com.trippin.api.user.repository.UserPrivacyRepository;
+import com.trippin.api.user.repository.UserProfileRepository;
+import java.util.Date;
+import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,12 +33,15 @@ public class UserService {
   private final UserLoginRepository userLoginRepository;
   private final AuthPasswordRepository authPasswordRepository;
   private final PasswordEncoder bCryptPasswordEncoder;
+  private final UserFollowRepository userFollowRepository;
+  private final UserPrivacyRepository userPrivacyRepository;
+  private final UserProfileRepository userProfileRepository;
 
   @Value("${jwt.secret}")
   private String secretKey;
 
   @Value("${jwt.access-token.expiretime}")
-  private long expireTime;     // Token 유효 시간 = 60분
+  private long expireTime;  // Token 유효 시간 = 60분
 
   public UserLogin join(JoinDto joinDto) {
     // dto -> entity
@@ -61,6 +74,9 @@ public class UserService {
 
     // 비밀번호 저장
     authPasswordRepository.save(authPassword);
+
+    // 유저의 팔로잉, 팔로워 초기화
+    userFollowRepository.save(new UserFollow(userId, 0, 0));
 
     // 생성된 유저 반환
     return user;
@@ -97,4 +113,82 @@ public class UserService {
     }
 
   }
+
+  public void delete(String userName) {
+    System.out.println("삭제");
+    userLoginRepository.deleteByUserName(userName);
+  }
+
+  public Object getUserinfo(String username) {
+    return null;
+  }
+
+  public List<?> getAllUsers() {
+    System.out.println("전체 리스트 조회");
+    List<UserLogin> users = userLoginRepository.findAll();
+    return users;
+  }
+
+  public Integer getFollowing(String username) {
+    Long id = userLoginRepository.findByUserName(username).getId();
+    System.out.println("follwing: " + userFollowRepository.findById(id).get().getFollowee());
+    return userFollowRepository.findById(id).get().getFollowee();
+  }
+
+  public Integer getFollower(String username) {
+    Long id = userLoginRepository.findByUserName(username).getId();
+    System.out.println("follwer: " + userFollowRepository.findById(id).get().getFollower());
+    return userFollowRepository.findById(id).get().getFollower();
+  }
+
+  public Object putPrivacy(String username, UserPrivacyDto userPrivacyDto) {
+    Long userId = userLoginRepository.findByUserName(username).getId();
+    UserPrivacy userPrivacy = userPrivacyDto.toEntity(userId);
+
+    // UserLogin에도 개인정보 저장
+    userLoginRepository.findByUserName(username).setUserPrivacy(userPrivacy);
+
+    return userPrivacyRepository.save(userPrivacy);
+//    return null;
+  }
+
+  public Object getPrivacy(String username) {
+    Long id = userLoginRepository.findByUserName(username).getId();
+    return userPrivacyRepository.findById(id);
+  }
+
+  public Object putProfile(String username, UserProfileDto userProfileDto) {
+    // TODO: 노완벽
+    Long userId = userLoginRepository.findByUserName(username).getId();
+
+    Date joinDate = new Date();
+    Date updateDate = new Date();
+
+    UserProfile userProfile = userProfileDto.toEntity(userId, joinDate, updateDate);
+
+    // UserLogin에도 프로필 저장
+    userLoginRepository.findByUserName(username).setUserProfile(userProfile);
+
+    return userProfileRepository.save(userProfile);
+  }
+
+  public Object getProfile(String username) {
+    Long id = userLoginRepository.findByUserName(username).getId();
+    return userProfileRepository.findById(id);
+  }
+
+  public Object postFollowing(String username) {
+    Long id = userLoginRepository.findByUserName(username).getId();
+    int followee = userFollowRepository.findById(id).get().getFollowee();
+    int follower = userFollowRepository.findById(id).get().getFollower();
+    return userFollowRepository.save(new UserFollow(id, follower, ++followee));
+  }
+
+  public Object postFollower(String username) {
+    Long id = userLoginRepository.findByUserName(username).getId();
+    int followee = userFollowRepository.findById(id).get().getFollowee();
+    int follower = userFollowRepository.findById(id).get().getFollower();
+    return userFollowRepository.save(new UserFollow(id, ++follower, followee));
+  }
+
 }
