@@ -4,21 +4,12 @@ import com.trippin.api.exception.BaseException;
 import com.trippin.api.exception.ErrorCode;
 import com.trippin.api.jwt.JwtTokenUtil;
 import com.trippin.api.user.domain.AuthPassword;
-import com.trippin.api.user.domain.UserFollow;
 import com.trippin.api.user.domain.UserLogin;
-import com.trippin.api.user.domain.UserPrivacy;
-import com.trippin.api.user.domain.UserProfile;
 import com.trippin.api.user.dto.JoinDto;
 import com.trippin.api.user.dto.LoginDto;
-import com.trippin.api.user.dto.UserPrivacyDto;
-import com.trippin.api.user.dto.UserProfileDto;
 import com.trippin.api.user.repository.AuthPasswordRepository;
-import com.trippin.api.user.repository.UserFollowRepository;
+import com.trippin.api.user.repository.MemoryTokenRepository;
 import com.trippin.api.user.repository.UserLoginRepository;
-import com.trippin.api.user.repository.UserPrivacyRepository;
-import com.trippin.api.user.repository.UserProfileRepository;
-import java.util.Date;
-import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,9 +24,11 @@ public class UserService {
   private final UserLoginRepository userLoginRepository;
   private final AuthPasswordRepository authPasswordRepository;
   private final PasswordEncoder bCryptPasswordEncoder;
-  private final UserFollowRepository userFollowRepository;
-  private final UserPrivacyRepository userPrivacyRepository;
-  private final UserProfileRepository userProfileRepository;
+  //  private final UserFollowRepository userFollowRepository;
+//  private final UserPrivacyRepository userPrivacyRepository;
+//  private final UserProfileRepository userProfileRepository;
+//  private final UserAchievementRepository userAchievementRepository;
+  private final MemoryTokenRepository memoryTokenRepository;
 
   @Value("${jwt.secret}")
   private String secretKey;
@@ -45,12 +38,7 @@ public class UserService {
 
   public UserLogin join(JoinDto joinDto) {
     // dto -> entity
-    UserLogin user = joinDto.toEntity();
-
-    // 비밀번호와 비밀번호확인 일치 판단
-    if (!joinDto.getPassword().equals(joinDto.getPasswordConfirm())) {
-      throw new BaseException(ErrorCode.PASSWORD_NOT_MATCH);
-    }
+    UserLogin userLogin = joinDto.toEntity();
 
     // 아이디나 이메일 중복 확인
     if (userLoginRepository.existsByEmailOrUserName(joinDto.getEmail(), joinDto.getUserName())) {
@@ -58,14 +46,14 @@ public class UserService {
     }
 
     // 유저 저장
-    userLoginRepository.save(user);
+    userLoginRepository.save(userLogin);
     System.out.println("회원가입 성공");
 
     // entity에서 pk 가져오기
-    Long userId = user.getId();
+    Long userId = userLogin.getId();
 
     AuthPassword authPassword = AuthPassword.builder()
-        .userId(userId)
+        .userId(userLogin)
         .password(joinDto.getPassword())
         .build();
 
@@ -75,11 +63,8 @@ public class UserService {
     // 비밀번호 저장
     authPasswordRepository.save(authPassword);
 
-    // 유저의 팔로잉, 팔로워 초기화
-    userFollowRepository.save(new UserFollow(userId, 0, 0));
-
     // 생성된 유저 반환
-    return user;
+    return userLogin;
   }
 
   public UserLogin login(LoginDto loginDto) {
@@ -103,9 +88,10 @@ public class UserService {
       System.out.println("로그인 성공");
 
       // 로그인 성공 => Jwt Token 발급
-      String jwtToken = JwtTokenUtil.createToken(userLogin.getUserName(), secretKey,
+      String jwtToken = JwtTokenUtil.createToken(userLogin, secretKey,
           expireTime);
-      userLogin.setToken(jwtToken);
+//      userLogin.setToken(jwtToken);
+      memoryTokenRepository.save(userLogin, jwtToken);
       return userLogin;
     } else {  // 회원정보는 있지만 비밀번호가 틀림
       System.out.println("비밀번호 틀림");
@@ -114,81 +100,95 @@ public class UserService {
 
   }
 
+  public void logout(String username) {
+    UserLogin userLogin = userLoginRepository.findByUserName(username);
+    memoryTokenRepository.delete(userLogin);
+    System.out.println("로그아웃 성공");
+  }
+
   public void delete(String userName) {
     System.out.println("삭제");
     userLoginRepository.deleteByUserName(userName);
   }
 
-  public Object getUserinfo(String username) {
-    return null;
-  }
-
-  public List<?> getAllUsers() {
-    System.out.println("전체 리스트 조회");
-    List<UserLogin> users = userLoginRepository.findAll();
-    return users;
-  }
-
-  public Integer getFollowing(String username) {
-    Long id = userLoginRepository.findByUserName(username).getId();
-    System.out.println("follwing: " + userFollowRepository.findById(id).get().getFollowee());
-    return userFollowRepository.findById(id).get().getFollowee();
-  }
-
-  public Integer getFollower(String username) {
-    Long id = userLoginRepository.findByUserName(username).getId();
-    System.out.println("follwer: " + userFollowRepository.findById(id).get().getFollower());
-    return userFollowRepository.findById(id).get().getFollower();
-  }
-
-  public Object putPrivacy(String username, UserPrivacyDto userPrivacyDto) {
-    Long userId = userLoginRepository.findByUserName(username).getId();
-    UserPrivacy userPrivacy = userPrivacyDto.toEntity(userId);
-
-    // UserLogin에도 개인정보 저장
-    userLoginRepository.findByUserName(username).setUserPrivacy(userPrivacy);
-
-    return userPrivacyRepository.save(userPrivacy);
+//  public Object getUserinfo(String username) {
 //    return null;
-  }
+//  }
+//
+//  public List<?> getAllUsers() {
+//    System.out.println("전체 리스트 조회");
+//    List<UserLogin> users = userLoginRepository.findAll();
+//    return users;
+//  }
+//
+//  public Integer getFollowing(String username) {
+//    Long id = userLoginRepository.findByUserName(username).getId();
+//    System.out.println("follwing: " + userFollowRepository.findById(id).get().getFollowee());
+//    return userFollowRepository.findById(id).get().getFollowee();
+//  }
 
-  public Object getPrivacy(String username) {
-    Long id = userLoginRepository.findByUserName(username).getId();
-    return userPrivacyRepository.findById(id);
-  }
+//  public Integer getFollower(String username) {
+//    Long id = userLoginRepository.findByUserName(username).getId();
+//    System.out.println("follwer: " + userFollowRepository.findById(id).get().getFollower());
+//    return userFollowRepository.findById(id).get().getFollower();
+//  }
 
-  public Object putProfile(String username, UserProfileDto userProfileDto) {
-    // TODO: 노완벽
-    Long userId = userLoginRepository.findByUserName(username).getId();
-
-    Date joinDate = new Date();
-    Date updateDate = new Date();
-
-    UserProfile userProfile = userProfileDto.toEntity(userId, joinDate, updateDate);
-
-    // UserLogin에도 프로필 저장
-    userLoginRepository.findByUserName(username).setUserProfile(userProfile);
-
-    return userProfileRepository.save(userProfile);
-  }
-
-  public Object getProfile(String username) {
-    Long id = userLoginRepository.findByUserName(username).getId();
-    return userProfileRepository.findById(id);
-  }
-
-  public Object postFollowing(String username) {
-    Long id = userLoginRepository.findByUserName(username).getId();
-    int followee = userFollowRepository.findById(id).get().getFollowee();
-    int follower = userFollowRepository.findById(id).get().getFollower();
-    return userFollowRepository.save(new UserFollow(id, follower, ++followee));
-  }
-
-  public Object postFollower(String username) {
-    Long id = userLoginRepository.findByUserName(username).getId();
-    int followee = userFollowRepository.findById(id).get().getFollowee();
-    int follower = userFollowRepository.findById(id).get().getFollower();
-    return userFollowRepository.save(new UserFollow(id, ++follower, followee));
-  }
-
+//  public Object putPrivacy(String username, UserPrivacyDto userPrivacyDto) {
+//    Long userId = userLoginRepository.findByUserName(username).getId();
+//    UserPrivacy userPrivacy = userPrivacyDto.toEntity(userId);
+//
+//    // UserLogin에도 개인정보 저장
+//    userLoginRepository.findByUserName(username).setUserPrivacy(userPrivacy);
+//
+//    return userPrivacyRepository.save(userPrivacy);
+////    return null;
+//  }
+//
+//  public Object getPrivacy(String username) {
+//    Long id = userLoginRepository.findByUserName(username).getId();
+//    return userPrivacyRepository.findById(id);
+//  }
+//
+//  public Object putProfile(String username, UserProfileDto userProfileDto) {
+//    // TODO: 노완벽
+//    Long userId = userLoginRepository.findByUserName(username).getId();
+//
+//    Date joinDate = new Date();
+//    Date updateDate = new Date();
+//
+//    UserProfile userProfile = userProfileDto.toEntity(userId, joinDate, updateDate);
+//
+//    // UserLogin에도 프로필 저장
+//    userLoginRepository.findByUserName(username).setUserProfile(userProfile);
+//
+//    return userProfileRepository.save(userProfile);
+//  }
+//
+//  public Object getProfile(String username) {
+//    Long id = userLoginRepository.findByUserName(username).getId();
+//    return userProfileRepository.findById(id);
+//  }
+//
+//  public Object postFollowing(String username) {
+//    Long id = userLoginRepository.findByUserName(username).getId();
+//    int followee = userFollowRepository.findById(id).get().getFollowee();
+//    int follower = userFollowRepository.findById(id).get().getFollower();
+//    return userFollowRepository.save(new UserFollow(id, follower, ++followee));
+//  }
+//
+//  public Object postFollower(String username) {
+//    Long id = userLoginRepository.findByUserName(username).getId();
+//    int followee = userFollowRepository.findById(id).get().getFollowee();
+//    int follower = userFollowRepository.findById(id).get().getFollower();
+//    return userFollowRepository.save(new UserFollow(id, ++follower, followee));
+//  }
+//
+//  public Object postAchievement(String username, UserAchievementDto userAchievementDto) {
+//    UserLogin userLogin = userLoginRepository.findByUserName(username);
+//    UserAchievement userAchievement = userAchievementDto.toEntity(userLogin);
+//
+//    userAchievement.setUserLogin(userLogin);
+//
+//    return userAchievementRepository.save(userAchievement);
+//  }
 }
