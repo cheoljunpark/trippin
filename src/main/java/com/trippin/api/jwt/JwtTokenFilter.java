@@ -1,6 +1,7 @@
 package com.trippin.api.jwt;
 
 import com.trippin.api.user.domain.UserLogin;
+import com.trippin.api.user.repository.MemoryTokenRepository;
 import com.trippin.api.user.repository.UserLoginRepository;
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -20,6 +21,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
   private final UserLoginRepository userLoginRepository;
   private final String secretKey;
+  private final MemoryTokenRepository memoryTokenRepository;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -43,6 +45,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     // 전송받은 Jwt Token이 만료되었으면 => 다음 필터 진행(인증 X)
     if (JwtTokenUtil.isExpired(token, secretKey)) {
+      // 등록된 유저 토큰 정보 삭제
+      UserLogin userLogin = memoryTokenRepository.getUserLoginByToken(token);
+      memoryTokenRepository.delete(userLogin);
+
       filterChain.doFilter(request, response);
       return;
     }
