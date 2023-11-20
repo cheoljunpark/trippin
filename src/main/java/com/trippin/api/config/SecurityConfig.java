@@ -1,6 +1,7 @@
 package com.trippin.api.config;
 
 import com.trippin.api.jwt.JwtTokenFilter;
+import com.trippin.api.user.repository.MemoryTokenRepository;
 import com.trippin.api.user.repository.UserLoginRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserLoginRepository userLoginRepository;
   @Value("${jwt.secret}")
   private static String secretKey;
+  private final MemoryTokenRepository memoryTokenRepository;
 
   /**
    * PasswordEncoder를 Bean으로 등록
@@ -56,6 +58,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       "/users/{username}/follower",
       "/users/{username}/privacy",
       "/users/{username}/profile",
+      "/courses/",
+      "/courses/{username}",
+      "/users/{username}/achievement",
+      "/users/{username}/logout",
   };
 
 
@@ -71,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll()
         .anyRequest().authenticated()
         .and()
-        .addFilterBefore(new JwtTokenFilter(userLoginRepository, secretKey),
+        .addFilterBefore(new JwtTokenFilter(userLoginRepository, secretKey, memoryTokenRepository),
             UsernamePasswordAuthenticationFilter.class); // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
     // + 토큰에 저장된 유저정보를 활용하여야 하기 때문에 CustomUserDetailService 클래스를 생성합니다.
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
