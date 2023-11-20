@@ -28,10 +28,6 @@ public class JoinDto {
   @JsonProperty("password")
   private String password;
 
-  @ApiModelProperty(value = "비밀번호 확인", example = "1234", required = true)
-  @JsonProperty("password-confirm")
-  private String passwordConfirm;
-
   public UserLogin toEntity() {
     return UserLogin.builder()
         .email(email)
