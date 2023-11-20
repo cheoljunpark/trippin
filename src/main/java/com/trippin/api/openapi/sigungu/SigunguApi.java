@@ -1,15 +1,18 @@
 package com.trippin.api.openapi.sigungu;
 
+import com.trippin.api.util.YamlLoadFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource(value = {"classpath:application-api.yml"}, factory = YamlLoadFactory.class)
 public class SigunguApi {
 
-  @Value("${open-api.service-key}")
+  @Value("${api.open-api.service-key}")
   private String serviceKey;
 
   public URL getSigunguCode(String areaCode) throws IOException {

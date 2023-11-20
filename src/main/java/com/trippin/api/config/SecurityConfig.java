@@ -3,9 +3,11 @@ package com.trippin.api.config;
 import com.trippin.api.jwt.JwtTokenFilter;
 import com.trippin.api.user.repository.MemoryTokenRepository;
 import com.trippin.api.user.repository.UserLoginRepository;
-import lombok.RequiredArgsConstructor;
+import com.trippin.api.util.YamlLoadFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,14 +21,43 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *
  * @Configuration 애노테이션 대신 @EnableWebSecurity 애노테이션을 추가한다.
  */
-@RequiredArgsConstructor
+@PropertySources({
+    @PropertySource(value = {"classpath:application-jwt.yml"}, factory = YamlLoadFactory.class),
+    @PropertySource(value = {"classpath:application-api.yml"}, factory = YamlLoadFactory.class)
+})
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final UserLoginRepository userLoginRepository;
-  @Value("${jwt.secret}")
-  private static String secretKey;
   private final MemoryTokenRepository memoryTokenRepository;
+  private final String secretKey;
+  private final String apiVersion;
+
+  public SecurityConfig(UserLoginRepository userLoginRepository,
+      MemoryTokenRepository memoryTokenRepository,
+      @Value("${jwt.secret}") String secretKey,
+      @Value("${api.version}") String apiVersion) {
+
+    this.userLoginRepository = userLoginRepository;
+    this.memoryTokenRepository = memoryTokenRepository;
+    this.secretKey = secretKey;
+    this.apiVersion = apiVersion;
+    this.PERMITTED_URL = new String[]{
+        /* swagger v2 */
+        "/v2/api-docs",
+        "/swagger-resources",
+        "/swagger-resources/**",
+        "/configuration/ui",
+        "/configuration/security",
+        "/swagger-ui.html",
+        "/webjars/**",
+        /* swagger v3 */
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        /* API */
+        apiVersion + "/**",
+    };
+  }
 
   /**
    * PasswordEncoder를 Bean으로 등록
@@ -36,34 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
 
-  private static final String[] PERMIT_URL_ARRAY = {
-      /* swagger v2 */
-      "/v2/api-docs",
-      "/swagger-resources",
-      "/swagger-resources/**",
-      "/configuration/ui",
-      "/configuration/security",
-      "/swagger-ui.html",
-      "/webjars/**",
-      /* swagger v3 */
-      "/v3/api-docs/**",
-      "/swagger-ui/**",
-      /* trippin */
-      "/",
-      "/users/join",
-      "/users/login",
-      "/users/",
-      "/users/{username}",
-      "/users/{username}/following",
-      "/users/{username}/follower",
-      "/users/{username}/privacy",
-      "/users/{username}/profile",
-      "/courses/",
-      "/courses/{username}",
-      "/users/{username}/achievement",
-      "/users/{username}/logout",
-  };
-
+  private final String[] PERMITTED_URL;
 
   /**
    * 인증 or 인가에 대한 설정
@@ -73,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http
         .csrf().disable() // post 방식으로 값을 전송할 때 token을 사용해야하는 보안 설정을 해제
         .authorizeRequests()
-        .antMatchers(PERMIT_URL_ARRAY)
+        .antMatchers(PERMITTED_URL)
         .permitAll()
         .anyRequest().authenticated()
         .and()

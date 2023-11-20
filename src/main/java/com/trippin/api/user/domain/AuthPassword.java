@@ -33,9 +33,6 @@ public class AuthPassword {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-//  @Column(name = "user_id", nullable = false)
-//  private Long userId;
-
   @OneToOne
   @JoinColumn(name = "user_id")
   private UserLogin userId;
