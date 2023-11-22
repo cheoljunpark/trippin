@@ -1,4 +1,4 @@
-package com.trippin.api.openapi.area;
+package com.trippin.api.openapi.api;
 
 import com.trippin.api.util.YamlLoadFactory;
 import java.io.IOException;
