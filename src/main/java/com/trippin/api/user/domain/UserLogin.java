@@ -1,5 +1,6 @@
 package com.trippin.api.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "user_login")
+@JsonIgnoreProperties({"id"})
 public class UserLogin {
+
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,21 +32,18 @@ public class UserLogin {
   @Column(name = "username", nullable = false, length = 20)
   private String userName;
 
-//  @Column(name = "token")
-//  private String token;
-//
-//  @OneToOne(cascade = CascadeType.PERSIST)
+//  @OneToOne(cascade = CascadeType.ALL)
 //  @JoinColumn(name = "user_privacy_id")
 //  private UserPrivacy userPrivacy;
 //
-//  @OneToOne(cascade = CascadeType.PERSIST)
+//  @OneToOne(cascade = CascadeType.ALL)
 //  @JoinColumn(name = "user_profile_id")
 //  private UserProfile userProfile;
 //
-//  @OneToMany(mappedBy = "userLogin", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+//  @OneToMany(mappedBy = "userLoginId", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 //  private List<Course> courses = new ArrayList<>();
 //
-//  @OneToMany(mappedBy = "userLogin", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+//  @OneToMany(mappedBy = "userLoginId", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 //  private List<UserAchievement> userAchievements = new ArrayList<>();
 
 }
