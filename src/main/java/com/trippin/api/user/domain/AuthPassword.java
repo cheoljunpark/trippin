@@ -1,6 +1,8 @@
 package com.trippin.api.user.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,15 +29,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "auth_password")
+@JsonIgnoreProperties({"id"})
 public class AuthPassword {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @JsonIgnore
   @OneToOne
   @JoinColumn(name = "user_id")
-  private UserLogin userId;
+  private UserLogin userLoginId;
 
   @Column(name = "password", nullable = false)
   private String password;

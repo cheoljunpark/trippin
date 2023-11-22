@@ -1,10 +1,10 @@
 package com.trippin.api.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.trippin.api.user.domain.UserLogin;
 import com.trippin.api.user.domain.UserProfile;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,13 +26,11 @@ public class UserProfileDto {
   @JsonProperty("image-url")
   private String imageUrl;
 
-  public UserProfile toEntity(Long userId, Date joinDate, Date updateDate) {
+  public UserProfile toEntity(UserLogin userLoginId) {
     return UserProfile.builder()
-        .userId(userId)
+        .userLoginId(userLoginId)
         .introduction(introduction)
         .imageUrl(imageUrl)
-        .joinDate(joinDate)
-        .updateDate(updateDate)
         .build();
   }
 }

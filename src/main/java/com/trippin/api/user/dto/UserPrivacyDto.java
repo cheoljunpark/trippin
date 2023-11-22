@@ -1,6 +1,7 @@
 package com.trippin.api.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.trippin.api.user.domain.UserLogin;
 import com.trippin.api.user.domain.UserPrivacy;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,9 +26,9 @@ public class UserPrivacyDto {
   @JsonProperty("birthday")
   private Date birthday;
 
-  public UserPrivacy toEntity(Long userId) {
+  public UserPrivacy toEntity(UserLogin userLoginId) {
     return UserPrivacy.builder()
-        .userId(userId)
+        .userLoginId(userLoginId)
         .cellPhone(cellPhone)
         .birthday(birthday)
         .build();

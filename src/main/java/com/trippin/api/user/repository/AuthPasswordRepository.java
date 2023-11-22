@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AuthPasswordRepository extends JpaRepository<AuthPassword, Long> {
 
-  AuthPassword findByUserId(UserLogin userLogin);
+  AuthPassword findByUserLoginId(UserLogin userLogin);
 }
