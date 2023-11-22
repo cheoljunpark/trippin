@@ -61,7 +61,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-        loginUser.getUserName(), null);
+        loginUser.getUsername(), null);
     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
     // 권한 부여

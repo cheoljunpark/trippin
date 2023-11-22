@@ -33,11 +33,11 @@ public class AuthService {
 
   public UserLogin login(LoginDto loginDto) {
     // 유저가 있으면 entity에 담기
-    UserLogin userLogin = userLoginRepository.findByEmailOrUserName(loginDto.getEmail(),
-        loginDto.getUserName());
+    UserLogin userLogin = userLoginRepository.findByEmailOrUsername(loginDto.getEmail(),
+        loginDto.getUsername());
 
     // 아이디나 이메일이 일치하는 유저가 없을 때
-    if (!userLoginRepository.existsByUserName(loginDto.getUserName())
+    if (!userLoginRepository.existsByUserName(loginDto.getUsername())
         && !userLoginRepository.existsByEmail(loginDto.getEmail())) {
       System.out.println("회원정보가 없음");
       throw new BaseException(ErrorCode.MEMBER_NOT_FOUND);
