@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AreaCodeRepository extends JpaRepository<AreaCode, Long> {
 
+  AreaCode findByCode(String code);
 }

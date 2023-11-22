@@ -1,10 +1,13 @@
 package com.trippin.api.course.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,11 +26,13 @@ public class SigunguCode {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, length = 5)
+  @Column(name = "code", nullable = false, length = 5)
   private String code;
 
-  @Column(name = "area_code", nullable = false, length = 5)
-  private String areaCode;
+  @JsonIgnore
+  @OneToOne
+  @JoinColumn(name = "area_code")
+  private AreaCode areaCode;
 
   @Column(name = "name", length = 50)
   private String name;

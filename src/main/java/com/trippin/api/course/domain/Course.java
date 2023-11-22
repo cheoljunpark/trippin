@@ -1,10 +1,14 @@
 package com.trippin.api.course.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,9 +51,13 @@ public class Course {
   @Column(name = "overview", columnDefinition = "LONGTEXT")
   private String overview;
 
-  @Column(name = "areaCode", length = 5)
-  private String areaCode;
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "area_code")
+  private AreaCode areaCode;
 
-  @Column(name = "sigunguCode", length = 5)
-  private String sigunguCode;
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "sigungu_code")
+  private SigunguCode sigunguCode;
 }
