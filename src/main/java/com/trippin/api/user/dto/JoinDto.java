@@ -22,7 +22,7 @@ public class JoinDto {
 
   @ApiModelProperty(value = "유저 네임", example = "ssafy", required = true)
   @JsonProperty("username")
-  private String userName;
+  private String username;
 
   @ApiModelProperty(value = "비밀번호", example = "1234", required = true)
   @JsonProperty("password")
@@ -31,7 +31,7 @@ public class JoinDto {
   public UserLogin toEntity() {
     return UserLogin.builder()
         .email(email)
-        .userName(userName)
+        .username(username)
         .build();
   }
 }

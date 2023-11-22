@@ -9,13 +9,13 @@ public interface UserLoginRepository extends JpaRepository<UserLogin, Long> {
 
   UserLogin findByEmail(String input);
 
-  UserLogin findByUserName(String userName);
+  UserLogin findByUsername(String userName);
 
   Boolean existsByUsername(String userName);
 
   Boolean existsByEmail(String email);
 
-  Boolean existsByEmailOrUserName(String email, String userName);
+  Boolean existsByEmailOrUsername(String email, String userName);
 
-  void deleteByUserName(String userName);
+  void deleteByUsername(String userName);
 }

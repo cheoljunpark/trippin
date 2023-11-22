@@ -70,7 +70,7 @@ public class UserService {
     UserLogin userLogin = joinDto.toEntity();
 
     // 아이디나 이메일 중복 확인
-    if (userLoginRepository.existsByEmailOrUserName(joinDto.getEmail(), joinDto.getUserName())) {
+    if (userLoginRepository.existsByEmailOrUsername(joinDto.getEmail(), joinDto.getUsername())) {
       throw new BaseException(ErrorCode.DUPLICATED_EMAIL);
     }
 
@@ -99,7 +99,7 @@ public class UserService {
 
   public void delete(String userName) {
     System.out.println("삭제");
-    userLoginRepository.deleteByUserName(userName);
+    userLoginRepository.deleteByUsername(userName);
   }
 
   public Object getUserinfo(String username) {
@@ -113,35 +113,35 @@ public class UserService {
   }
 
   public Object postPrivacy(String username, UserPrivacyDto userPrivacyDto) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     UserPrivacy userPrivacy = userPrivacyDto.toEntity(userLoginId);
     return userPrivacyRepository.save(userPrivacy);
   }
 
   public Object getPrivacy(String username) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     return userPrivacyRepository.findByUserLoginId(userLoginId);
   }
 
   public Object postProfile(String username, UserProfileDto userProfileDto) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     UserProfile userProfile = userProfileDto.toEntity(userLoginId);
     return userProfileRepository.save(userProfile);
   }
 
   public Object putProfile(String username, UserProfileDto userProfileDto) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     UserProfile userProfile = userProfileDto.toEntity(userLoginId);
     return userProfile;
   }
 
   public Object getProfile(String username) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     return userProfileRepository.findByUserLoginId(userLoginId);
   }
 
   public Object postCourse(String username, UserCourseDto userCourseDto) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     Long courseId = userCourseDto.getCourseId();
 
     Course course = courseRepository.findById(courseId).get();
@@ -151,7 +151,7 @@ public class UserService {
   }
 
   public Object postAchievement(String username, UserAchievementDto userAchievementDto) {
-    UserLogin userLoginId = userLoginRepository.findByUserName(username);
+    UserLogin userLoginId = userLoginRepository.findByUsername(username);
     Achievement achievementId = achievementRepository.findById(
             userAchievementDto.getAchievementId())
         .get();

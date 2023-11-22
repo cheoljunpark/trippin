@@ -36,7 +36,7 @@ public class AuthService {
     String usernameOrEmail = loginDto.getUsernameOrEmail();
 
     // 아이디나 이메일이 일치하는 유저가 없을 때
-    if (!userLoginRepository.existsByUserName(usernameOrEmail)
+    if (!userLoginRepository.existsByUsername(usernameOrEmail)
         && !userLoginRepository.existsByEmail(usernameOrEmail)) {
       System.out.println("회원정보가 없음");
       throw new BaseException(ErrorCode.MEMBER_NOT_FOUND);
@@ -45,7 +45,7 @@ public class AuthService {
     UserLogin userLogin = userLoginRepository.findByEmail(usernameOrEmail);
     // 유저가 있으면 entity에 담기
     if (userLogin == null) {
-      userLogin = userLoginRepository.findByUserName(usernameOrEmail);
+      userLogin = userLoginRepository.findByUsername(usernameOrEmail);
     }
 
     // 아이디나 이메일이 일치하는 유저가 있을 때
@@ -60,7 +60,7 @@ public class AuthService {
 //      userLogin.setToken(jwtToken);
       memoryTokenRepository.save(userLogin, jwtToken);
 
-      return LoginResponseDto.builder().userName(userLogin.getUsername())
+      return LoginResponseDto.builder().username(userLogin.getUsername())
           .email(userLogin.getEmail()).token(memoryTokenRepository.read(userLogin)).build();
 
 
@@ -72,7 +72,7 @@ public class AuthService {
   }
 
   public void logout(String username) {
-    UserLogin userLogin = userLoginRepository.findByUserName(username);
+    UserLogin userLogin = userLoginRepository.findByUsername(username);
     memoryTokenRepository.delete(userLogin);
     System.out.println("로그아웃 성공");
   }

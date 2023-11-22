@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDto {
 
   @ApiModelProperty(value = "유저 네임", example = "ssafy", required = true)
-  @JsonProperty("userName")
-  private String userName;
+  @JsonProperty("username")
+  private String username;
 
   @ApiModelProperty(value = "유저 이메일", example = "ssafy@gmail.com", required = true)
   @JsonProperty("email")
