@@ -8,12 +8,13 @@ import com.trippin.api.course.repository.AreaCodeRepository;
 import com.trippin.api.course.repository.CourseRepository;
 import com.trippin.api.course.repository.SigunguCodeRepository;
 import com.trippin.api.course.repository.SpotRepository;
-import com.trippin.api.openapi.area.AreaApi;
-import com.trippin.api.openapi.course.CourseApi;
-import com.trippin.api.openapi.sigungu.SigunguApi;
-import com.trippin.api.openapi.spot.SpotApi;
+import com.trippin.api.openapi.api.AreaApi;
+import com.trippin.api.openapi.api.CourseApi;
+import com.trippin.api.openapi.api.SigunguApi;
+import com.trippin.api.openapi.api.SpotApi;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
@@ -21,16 +22,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Transactional
-@Component
+//@Component
 public class OpenApiUtil {
 
   private final AreaApi areaApi;
-  private final CourseApi courseApi;
   private final SigunguApi sigunguApi;
+  private final CourseApi courseApi;
   private final SpotApi spotApi;
   private final AreaCodeRepository areaCodeRepository;
   private final SigunguCodeRepository sigunguCodeRepository;
@@ -38,7 +38,7 @@ public class OpenApiUtil {
   private final SpotRepository spotRepository;
 
   private static JSONParser parser = new JSONParser();
-  
+
   private JSONArray parse(JSONObject jsonObject) {
     JSONObject response = (JSONObject) jsonObject.get("response");
     JSONObject body = (JSONObject) response.get("body");
@@ -47,7 +47,7 @@ public class OpenApiUtil {
     return item;
   }
 
-  @Bean
+  //  @Bean
   private void dbAreaCode() throws IOException, ParseException {
 
     // JSONParser로 JSONObject로 변환
@@ -61,7 +61,12 @@ public class OpenApiUtil {
     for (int i = 0; i < item.size(); i++) {
       String code = (String) ((JSONObject) item.get(i)).get("code");
       String name = (String) ((JSONObject) item.get(i)).get("name");
-      areaCodeRepository.save(new AreaCode(code, name));
+      AreaCode areaCode = AreaCode.builder()
+          .code(code)
+          .name(name)
+          .build();
+
+      areaCodeRepository.save(areaCode);
     }
 
   }
@@ -77,20 +82,22 @@ public class OpenApiUtil {
     JSONArray item = parse(jsonObject);
 
     // 각 지역코드(areaCode)에 맞는 url 가져오기
-    for (int i = 0; i < item.size(); i++) {
-      String areaCode = (String) ((JSONObject) item.get(i)).get("code");
+    List<AreaCode> areaCodeList = areaCodeRepository.findAll();
+    for (int i = 0; i < areaCodeList.size(); i++) {
+      String areaCode = areaCodeList.get(i).getCode();
       JSONObject jsonObject2 = (JSONObject) parser.parse(
           OpenApiExplorer.getData(sigunguApi.getSigunguCode(areaCode)));
       JSONArray item2 = parse(jsonObject2);
 
       // 각 지역코드(areaCode)마다 시군구코드(sigunguCode) 가져오기
       for (int j = 0; j < item2.size(); j++) {
-        String sigunguCode = (String) ((JSONObject) item2.get(j)).get("code");
-        String sigunguName = (String) ((JSONObject) item2.get(j)).get("name");
-        SigunguCode sc = new SigunguCode();
-        sc.setCode(sigunguCode);
-        sc.setAreaCode(areaCode);
-        sc.setName(sigunguName);
+        String code = (String) ((JSONObject) item2.get(j)).get("code");
+        String name = (String) ((JSONObject) item2.get(j)).get("name");
+        SigunguCode sc = SigunguCode.builder()
+            .code(code)
+            .areaCode(areaCodeList.get(i))
+            .name(name)
+            .build();
         sigunguCodeRepository.save(sc); // DB에 저장
       }
     }
@@ -105,7 +112,7 @@ public class OpenApiUtil {
 
     // "공통정보조회"에서 "contentid"를 기반으로 데이터를 가져온다
     // 각 "contentid"별로 공통정보조회 조회
-    for (int i = 0; i < item.size(); i++) {
+    for (int i = 0; i < 100; i++) {
       String contentId = (String) ((JSONObject) item.get(i)).get("contentid");
       JSONObject jsonObject2 = (JSONObject) parser.parse(
           OpenApiExplorer.getData(courseApi.getCourseInfo(contentId)));
@@ -129,17 +136,19 @@ public class OpenApiUtil {
       String sigungucode = (String) ((JSONObject) item2.get(0)).get("sigungucode");
 
       // DB에 저장
-      Course course = new Course();
-      course.setTitle(title);
-      course.setDistance(distance);
-      course.setAddress(addr1);
-      course.setMapx(mapx);
-      course.setMapy(mapy);
-      course.setImage(firstimage);
-      course.setCategory(cat1);
-      course.setOverview(overview);
-      course.setAreaCode(areacode);
-      course.setSigunguCode(sigungucode);
+      Course course = Course.builder()
+          .title(title)
+          .distance(distance)
+          .address(addr1)
+          .mapx(mapx)
+          .mapy(mapy)
+          .image(firstimage)
+          .category(cat1)
+          .overview(overview)
+          .areaCode(areaCodeRepository.findByCode(areacode))
+          .sigunguCode(sigunguCodeRepository.findByCode(sigungucode))
+          .build();
+
       courseRepository.save(course);
     }
 
@@ -149,18 +158,16 @@ public class OpenApiUtil {
   private void dbSpotInfo() throws IOException, ParseException, URISyntaxException {
 
     // "지역기반 관광정보조회"에서 관광지(12)의 "contentid"를 가져온다
-    String rawData = OpenApiExplorer.fetch(spotApi.getSpotContentId());
-    String cleanedData = rawData.replaceAll("\\<.*?\\>", "");
-    JSONObject jsonObject = (JSONObject) parser.parse(cleanedData);
+    JSONObject jsonObject = (JSONObject) parser.parse(
+        OpenApiExplorer.fetch(spotApi.getSpotContentId()));
     JSONArray item = parse(jsonObject);
 
     // "공통정보조회"에서 "contentid"를 기반으로 데이터를 가져온다
     // 각 "contentid"별로 공통정보조회 조회
     for (int i = 0; i < item.size(); i++) {
       String contentId = (String) ((JSONObject) item.get(i)).get("contentid");
-      String rawData2 = OpenApiExplorer.fetch(spotApi.getSpotInfo(contentId));
-      String cleanedData2 = rawData2.replaceAll("\\<.*?\\>", "");
-      JSONObject jsonObject2 = (JSONObject) parser.parse(cleanedData2);
+      JSONObject jsonObject2 = (JSONObject) parser.parse(
+          OpenApiExplorer.fetch(spotApi.getSpotInfo(contentId)));
       JSONArray item2 = parse(jsonObject2);
 
       // 조회한 공통정보에서 데이터 추출
@@ -175,19 +182,19 @@ public class OpenApiUtil {
       String sigungucode = (String) ((JSONObject) item2.get(0)).get("sigungucode");
 
       // DB에 저장
-      Spot spot = new Spot();
-      spot.setTitle(title);
-      spot.setAddress(addr1);
-      spot.setMapx(mapx);
-      spot.setMapy(mapy);
-      spot.setImage(firstimage);
-      spot.setCategory(cat1);
-      spot.setOverview(overview);
-      spot.setAreaCode(areacode);
-      spot.setSigunguCode(sigungucode);
+      Spot spot = Spot.builder()
+          .title(title)
+          .address(addr1)
+          .mapx(mapx)
+          .mapy(mapy)
+          .image(firstimage)
+          .category(cat1)
+          .overview(overview)
+          .areaCode(areaCodeRepository.findByCode(areacode))
+          .sigunguCode(sigunguCodeRepository.findByCode(sigungucode))
+          .build();
+
       spotRepository.save(spot);
     }
-
   }
-
 }
