@@ -30,7 +30,7 @@ public class UserLogin {
   private String email;
 
   @Column(name = "username", nullable = false, length = 20)
-  private String userName;
+  private String username;
 
 //  @OneToOne(cascade = CascadeType.ALL)
 //  @JoinColumn(name = "user_privacy_id")
