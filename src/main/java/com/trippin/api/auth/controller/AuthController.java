@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "인증, 인가")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.version}/users")
+@RequestMapping("${api.version}/auth")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AuthController {
 
