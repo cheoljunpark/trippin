@@ -45,7 +45,7 @@ public class AuthService {
 
     // 아이디나 이메일이 일치하는 유저가 있을 때
 //    Long userId = userLogin.getId();  // 아이디를 가져와서
-    AuthPassword ap = authPasswordRepository.findByUserId(userLogin); // 아이디와 일치하는 row를 가져옴
+    AuthPassword ap = authPasswordRepository.findByUserLoginId(userLogin); // 아이디와 일치하는 row를 가져옴
 
     if (ap.checkPassword(loginDto.getPassword(), bCryptPasswordEncoder)) {
       System.out.println("로그인 성공");
