@@ -47,7 +47,7 @@ public class OpenApiUtil {
     return item;
   }
 
-  //  @Bean
+  @Bean
   private void dbAreaCode() throws IOException, ParseException {
 
     // JSONParser로 JSONObject로 변환
@@ -112,7 +112,7 @@ public class OpenApiUtil {
 
     // "공통정보조회"에서 "contentid"를 기반으로 데이터를 가져온다
     // 각 "contentid"별로 공통정보조회 조회
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < item.size(); i++) {
       String contentId = (String) ((JSONObject) item.get(i)).get("contentid");
       JSONObject jsonObject2 = (JSONObject) parser.parse(
           OpenApiExplorer.getData(courseApi.getCourseInfo(contentId)));
@@ -146,7 +146,7 @@ public class OpenApiUtil {
           .category(cat1)
           .overview(overview)
           .areaCode(areaCodeRepository.findByCode(areacode))
-          .sigunguCode(sigunguCodeRepository.findByCode(sigungucode))
+          .sigunguCode(sigunguCodeRepository.findTopByCode(sigungucode))
           .build();
 
       courseRepository.save(course);
@@ -191,7 +191,7 @@ public class OpenApiUtil {
           .category(cat1)
           .overview(overview)
           .areaCode(areaCodeRepository.findByCode(areacode))
-          .sigunguCode(sigunguCodeRepository.findByCode(sigungucode))
+          .sigunguCode(sigunguCodeRepository.findTopByCode(sigungucode))
           .build();
 
       spotRepository.save(spot);
