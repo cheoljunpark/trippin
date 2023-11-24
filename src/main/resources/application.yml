@@ -3,35 +3,47 @@ server:
 
 spring:
   profiles:
-    include: db
-    active: jwt, api
+    include:
+      - db
+      - jwt
+      - api
 
   jpa:
     #open-in-view: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     #    show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format-sql: true
         show-sql: true
     defer-datasource-initialization: true
-
+    generate-ddl: true
+  
   sql:
     init:
       mode: always
 
-  logging:
-    level:
-      org:
-        springframework:
-          orm:
-            jpa: DEBUG
-      com.trippin.api: DEBUG
+
 
   security:
     user:
       name: ssafy
       password: ssafy
+
+  #swagger
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+    com:
+      trippin:
+        api: DEBUG

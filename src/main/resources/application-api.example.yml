@@ -1,0 +1,4 @@
+api:
+  version: # version here
+  open-api:
+    service-key: # service key here
