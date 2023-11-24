@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +30,7 @@ public class Course {
   @Column(name = "title", length = 50)
   private String title;
 
-  @Column(name = "distance", length = 10)
+  @Column(name = "distance", length = 200)
   private String distance;
 
   @Column(name = "address", length = 200)
@@ -52,12 +52,12 @@ public class Course {
   private String overview;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "area_code")
   private AreaCode areaCode;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "sigungu_code")
   private SigunguCode sigunguCode;
 }
