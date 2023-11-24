@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SigunguCodeRepository extends JpaRepository<SigunguCode, Long> {
 
-  SigunguCode findByCode(String sigungucode);
+  SigunguCode findTopByCode(String sigungucode);
+
 }
