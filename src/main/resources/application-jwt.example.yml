@@ -1,0 +1,7 @@
+# JWT
+jwt:
+  access-token:
+    expiretime: # jwt access token expire time here
+  refresh-token:
+    expiretime: # jwt refresh token expire time here
+  secret: # jwt secret here
