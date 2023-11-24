@@ -50,12 +50,12 @@ public class Spot {
   private String overview;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "area_code")
   private AreaCode areaCode;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "sigungu_code")
   private SigunguCode sigunguCode;
 }
