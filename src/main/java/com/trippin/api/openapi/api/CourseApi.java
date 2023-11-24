@@ -32,7 +32,7 @@ public class CourseApi {
         "&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json",
             "UTF-8"));
     urlBuilder.append(
-        "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("2000",
+        "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1070",
             "UTF-8"));
     urlBuilder.append(
         "&" + URLEncoder.encode("contentTypeId", "UTF-8") + "=" + URLEncoder.encode("25",
@@ -58,13 +58,34 @@ public class CourseApi {
         "&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json",
             "UTF-8"));
     urlBuilder.append(
-        "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("100",
+        "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1070",
             "UTF-8"));
     urlBuilder.append(
         "&" + URLEncoder.encode("contentId", "UTF-8") + "=" + URLEncoder.encode(contentId,
             "UTF-8"));
     urlBuilder.append(
         "&" + URLEncoder.encode("contentTypeId", "UTF-8") + "=" + URLEncoder.encode("25",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("defaultYN", "UTF-8") + "=" + URLEncoder.encode("Y",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("firstImageYN", "UTF-8") + "=" + URLEncoder.encode("Y",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("areacodeYN", "UTF-8") + "=" + URLEncoder.encode("Y",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("catcodeYN", "UTF-8") + "=" + URLEncoder.encode("Y",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("addrinfoYN", "UTF-8") + "=" + URLEncoder.encode("Y",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("mapinfoYN", "UTF-8") + "=" + URLEncoder.encode("Y",
+            "UTF-8"));
+    urlBuilder.append(
+        "&" + URLEncoder.encode("overviewYN", "UTF-8") + "=" + URLEncoder.encode("Y",
             "UTF-8"));
 
     return new URL(urlBuilder.toString());
@@ -87,7 +108,7 @@ public class CourseApi {
         "&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json",
             "UTF-8"));
     urlBuilder.append(
-        "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("100",
+        "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1",
             "UTF-8"));
     urlBuilder.append(
         "&" + URLEncoder.encode("contentId", "UTF-8") + "=" + URLEncoder.encode(contentId,
